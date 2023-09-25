@@ -1,0 +1,65 @@
+#1 [internal] load build definition from jpl_config.Dockerfile
+#1 transferring dockerfile: 43B done
+#1 DONE 0.0s
+
+#2 [internal] load .dockerignore
+#2 transferring context: 2B done
+#2 DONE 0.0s
+
+#3 [internal] load metadata for docker.io/rocker/tidyverse:4.3.1
+#3 DONE 1.9s
+
+#4 [ 1/15] FROM docker.io/rocker/tidyverse:4.3.1@sha256:4d1e14ea828baaae833064ba98abeef5db7bfd79226be12ae0d7c96db4ba5f17
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 208B done
+#5 DONE 0.0s
+
+#6 [ 4/15] WORKDIR /home/rstudio
+#6 CACHED
+
+#7 [14/15] ADD config/sascfg_personal.py /tmp/sascfg_personal.py
+#7 CACHED
+
+#8 [12/15] ADD config/starship.toml /srv/venv/starship.toml
+#8 CACHED
+
+#9 [10/15] RUN python3 -m venv /srv/venv &&     pip install --upgrade --no-cache-dir pip==23.0 wheel &&     /srv/venv/bin/pip install --upgrade --no-cache-dir     python-lsp-server     jedi-language-server     notebook     nbgitpuller     jupyterlab-sos     sos-javascript     jupyter_ai     transient-display-data     graphviz     imageio     pillow     sos-r     jupyter-rsession-proxy     feather-format     sos-python     sos-bash     bash_kernel     markdown-kernel     saspy==5.3.0     sos-sas     sas_kernel==2.4.13
+#9 CACHED
+
+#10 [13/15] ADD config/bash_aliases.sh /etc/profile.d/bash_aliases.sh
+#10 CACHED
+
+#11 [ 3/15] RUN echo "export PATH=/srv/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" >> ${HOME}/.profile
+#11 CACHED
+
+#12 [ 8/15] RUN Rscript -e "pak::pak(c('Microsoft365R', 'IRkernel', 'rio', 'plyr', 'TriMatch', 'MatchIt', 'ggbeeswarm', 'ggsignif', 'ggpubr', 'cowplot', 'ggthemes', 'reshape2', 'ggmosaic', 'randomcoloR'))"
+#12 CACHED
+
+#13 [ 5/15] RUN apt-get update && apt-get install -y     curl     nano     less     telnet     gnupg2     nodejs     npm     python3-venv python3-dev python3-wheel     openjdk-17-jdk     openjdk-17-jre &&     apt-get purge &&     apt-get clean &&     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+#13 CACHED
+
+#14 [11/15] ADD config/plugin.jupyterlab-settings /home/rstudio/.jupyter/lab/user-settings/@jupyterlab/terminal-extension/plugin.jupyterlab-settings
+#14 CACHED
+
+#15 [ 6/15] RUN latest_url=$(curl -s https://api.github.com/repos/ryanoasis/nerd-fonts/releases/latest | grep "browser_download_url" | grep "FiraCode.zip" | cut -d '"' -f 4) &&     curl -L -o FiraCode.zip $latest_url &&     unzip FiraCode.zip -d /usr/share/fonts &&     fc-cache -fv &&     rm FiraCode.zip &&     curl -sS https://starship.rs/install.sh | sh -s -- --yes &&     echo 'eval "$(starship init bash)"' >> /etc/profile
+#15 CACHED
+
+#16 [ 7/15] RUN Rscript -e "install.packages(c('pak'), lib = '/usr/local/lib/R/site-library')"
+#16 CACHED
+
+#17 [ 9/15] RUN mkdir -p /srv/venv && chown -R rstudio /srv/venv
+#17 CACHED
+
+#18 [ 2/15] RUN echo "PATH=/srv/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin" >> /usr/local/lib/R/etc/Renviron
+#18 CACHED
+
+#19 [15/15] RUN npm install -g --unsafe-perm ijavascript &&     ijsinstall --install=global --spec-path=full &&     python3 -m bash_kernel.install --prefix /srv/venv &&     python3 -m markdown_kernel.install --prefix /srv/venv &&     python3 -m sas_kernel.install --prefix /srv/venv &&     python3 -m sos_notebook.install --prefix /srv/venv &&     R --quiet -e "IRkernel::installspec(prefix='/srv/venv')" &&     chown -R rstudio:rstudio /srv/venv /home/rstudio
+#19 CACHED
+
+#20 exporting to image
+#20 exporting layers done
+#20 writing image sha256:62ef9a3dbab51483b0685c2ad8082f5a99be8dee123b19c13d0dce5692e08108 done
+#20 naming to docker.io/library/jpl_config done
+#20 DONE 0.0s
