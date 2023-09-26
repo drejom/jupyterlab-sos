@@ -13,12 +13,14 @@ ENV NB_UID 1000
 ENV VENV_DIR /srv/venv
 ENV SHELL /usr/bin/bash
 ENV STARSHIP_CONFIG ${VENV_DIR}/starship.toml
+ENV VSCODE_CLI_USE_FILE_KEYCHAIN=1
 
-# Set ENV for all programs...
+# Add ENV_DIR to $PATH
 ENV PATH ${VENV_DIR}/bin:$PATH
-# And set ENV for R! It doesn't read from the environment...
-RUN echo "PATH=${PATH}" >> /usr/local/lib/R/etc/Renviron
-RUN echo "export PATH=${PATH}" >> ${HOME}/.profile
+# Set PATH for R. It doesn't read from the environment...
+RUN printf "PATH=%s\nR_LIBS_USER=%s\n" "$PATH" "$R_LIBS_USER" >> /usr/local/lib/R/etc/Renviron.site
+# Sut PATH for $USER...necessary?
+#RUN echo "export PATH=${PATH}" >> ${HOME}/.profile
 
 # The `rsession` binary that is called by nbrsessionproxy to start R doesn't seem to start
 # without this being explicitly set
@@ -30,15 +32,17 @@ WORKDIR ${HOME}
 RUN apt-get update && apt-get install -y \
     # system
     curl \
+    jq \
     nano \
     less \
     telnet \
     gnupg2 \
-    nodejs \
-    npm \
+    ca-certificates \
     # python
     python3-venv python3-dev python3-wheel \
     # Java packages
+    nodejs \
+    npm \
     openjdk-17-jdk \
     openjdk-17-jre && \
     # cleanup
@@ -54,11 +58,9 @@ RUN latest_url=$(curl -s https://api.github.com/repos/ryanoasis/nerd-fonts/relea
     curl -sS https://starship.rs/install.sh | sh -s -- --yes && \
     echo 'eval "$(starship init bash)"' >> /etc/profile
 
-
-RUN Rscript -e "install.packages(c('pak'), lib = '/usr/local/lib/R/site-library')"
-
 # Install R packages
-RUN Rscript -e "pak::pak(c('Microsoft365R', 'IRkernel', 'rio', 'plyr', 'TriMatch', 'MatchIt', 'ggbeeswarm', 'ggsignif', 'ggpubr', 'cowplot', 'ggthemes', 'reshape2', 'ggmosaic', 'randomcoloR'))"
+RUN Rscript -e "install.packages(c('pak'), lib = '/usr/local/lib/R/site-library')" && \
+    Rscript -e "pak::pak(c('Microsoft365R', 'IRkernel', 'rio', 'plyr', 'TriMatch', 'MatchIt', 'ggbeeswarm', 'ggsignif', 'ggpubr', 'cowplot', 'ggthemes', 'reshape2', 'ggmosaic', 'randomcoloR', 'jsonlite', 'targets'))"
 
 RUN mkdir -p ${VENV_DIR} && chown -R ${NB_USER} ${VENV_DIR}
 USER ${NB_USER}
@@ -67,11 +69,13 @@ USER ${NB_USER}
 RUN python3 -m venv ${VENV_DIR} && \
     pip install --upgrade --no-cache-dir pip==23.0 wheel && \
     ${VENV_DIR}/bin/pip install --upgrade --no-cache-dir \
-    # JupyterLab SoS support
+    # JupyterLab 
+    jupyter-vscode-proxy \
     python-lsp-server \
     jedi-language-server \
     notebook \
     nbgitpuller \
+    nbformat \
     jupyterlab-sos \
     sos-javascript \
     jupyter_ai \
@@ -83,6 +87,7 @@ RUN python3 -m venv ${VENV_DIR} && \
     sos-r \
     jupyter-rsession-proxy \
     feather-format \
+    radian \
     # Python support
     sos-python \
     # Bash support
@@ -93,14 +98,14 @@ RUN python3 -m venv ${VENV_DIR} && \
     # SAS support
     saspy==5.3.0 \
     sos-sas \
-    sas_kernel==2.4.13
-    # # NLP
-    # openai \
-    # beautifulsoup4 \
-    # requests \
-    # transformers \
-    # argilla \
-    # scikit-learn
+    sas_kernel==2.4.13 \
+    # NLP
+    openai \
+    beautifulsoup4 \
+    requests \
+    transformers \
+    argilla \
+    scikit-learn
 
 # Copy confguration
 USER root
@@ -108,7 +113,10 @@ ADD config/plugin.jupyterlab-settings ${HOME}/.jupyter/lab/user-settings/@jupyte
 ADD config/starship.toml ${VENV_DIR}/starship.toml
 ADD config/bash_aliases.sh /etc/profile.d/bash_aliases.sh
 ADD config/sascfg_personal.py /tmp/sascfg_personal.py
-#RUN mv /tmp/sascfg_personal.py $(python -c 'import site; print(site.getsitepackages()[0])')/saspy/
+RUN mv /tmp/sascfg_personal.py $(python -c 'import site; print(site.getsitepackages()[0])')/saspy/
+
+# Install code-server
+RUN curl -fsSL https://code-server.dev/install.sh | sh -s -- --prefix=/usr/local 
 
 # Install jupyter kernels
 RUN npm install -g --unsafe-perm ijavascript && \
