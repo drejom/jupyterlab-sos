@@ -5,6 +5,8 @@
 1. Execute `sh {path_to_your_project}/run.sh`
 2. Open `localhost:8888` from a browser
 
+https://towardsdatascience.com/how-to-setup-your-jupyterlab-project-environment-74909dade29b
+
 ------------
 # Jupyterlab SOS
 [![Docker](https://github.com/drejom/jupyterhub/actions/workflows/build_publish_docker_image.yaml/badge.svg)](https://github.com/drejom/jupyterhub/actions/workflvows/build_publish_docker_image.yaml)
