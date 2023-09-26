@@ -7,6 +7,8 @@
 
 https://towardsdatascience.com/how-to-setup-your-jupyterlab-project-environment-74909dade29b
 
+https://hub.docker.com/r/rocker/binder/dockerfile
+
 ------------
 # Jupyterlab SOS
 [![Docker](https://github.com/drejom/jupyterhub/actions/workflows/build_publish_docker_image.yaml/badge.svg)](https://github.com/drejom/jupyterhub/actions/workflvows/build_publish_docker_image.yaml)
