@@ -70,7 +70,9 @@ RUN python3 -m venv ${VENV_DIR} && \
     pip install --upgrade --no-cache-dir pip==23.0 wheel && \
     ${VENV_DIR}/bin/pip install --upgrade --no-cache-dir \
     # JupyterLab 
+    jupyterhub \
     jupyter-vscode-proxy \
+    jupyter-server-proxy \
     python-lsp-server \
     jedi-language-server \
     notebook \
